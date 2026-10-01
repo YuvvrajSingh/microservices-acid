@@ -1,0 +1,14 @@
+{
+  "name": "@microservices-acid/order-service",
+  "version": "1.0.0",
+  "description": "Order Service with SQLite WAL and Transactional Outbox pattern",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "test": "tsx --test test/**/*.test.ts"
+  },
+  "dependencies": {
+    "better-sqlite3": "^13.0.3",
+    "express": "^5.2.1"
+  }
+}

@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 660" width="100%" height="auto">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#09090b"/>
+      <stop offset="100%" stop-color="#0e1117"/>
+    </linearGradient>
+    <linearGradient id="cyanGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00f0ff" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#7000ff" stop-opacity="0.8"/>
+    </linearGradient>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="115%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="24" stdDeviation="28" flood-color="#000" flood-opacity="0.65"/>
+      <feDropShadow dx="0" dy="0" stdDeviation="15" flood-color="#00f0ff" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <!-- Canvas Background -->
+  <rect width="1100" height="660" fill="#09090b"/>
+
+  <!-- Window Container -->
+  <g transform="translate(30, 25)" filter="url(#shadow)">
+    <!-- Window Border & Base -->
+    <rect width="1040" height="610" rx="10" fill="#0d1117" stroke="#30363d" stroke-width="1"/>
+
+    <!-- Window Titlebar -->
+    <path d="M 0,10 Q 0,0 10,0 L 1030,0 Q 1040,0 1040,10 L 1040,42 L 0,42 Z" fill="#161b22"/>
+    <line x1="0" y1="42" x2="1040" y2="42" stroke="#30363d" stroke-width="1"/>
+
+    <!-- Window Control Buttons -->
+    <circle cx="24" cy="21" r="6" fill="#f85149"/>
+    <circle cx="44" cy="21" r="6" fill="#e3b341"/>
+    <circle cx="64" cy="21" r="6" fill="#2ea043"/>
+
+    <!-- Titlebar Title -->
+    <text x="520" y="26" text-anchor="middle" font-family="'Geist Mono', 'SF Mono', Monaco, Menlo, monospace" font-size="12" fill="#8b949e" letter-spacing="0.5">yuvraj@node: ~/microservices-acid — npm run cli -- simulate</text>
+
+    <!-- Terminal Content Area -->
+    <g transform="translate(28, 70)" font-family="'Geist Mono', 'JetBrains Mono', 'SF Mono', Monaco, Menlo, monospace" font-size="13" xml:space="preserve">
+      <!-- Command prompt line -->
+      <text y="0">
+        <tspan fill="#6e7681">$ </tspan>
+        <tspan fill="#00f0ff" font-weight="bold">npm run cli -- simulate</tspan>
+      </text>
+
+      <!-- Banner box -->
+      <text y="30" fill="#58a6ff">┌────────────────────────────────────────────────────────────────────────┐</text>
+      <text y="50" fill="#58a6ff">│<tspan fill="#ffffff" font-weight="bold">         INTERACTIVE SAGA COMPENSATION SIMULATION                       </tspan><tspan fill="#58a6ff">│</tspan></text>
+      <text y="70" fill="#58a6ff">│<tspan fill="#8b949e">     Simulating Insufficient Funds &amp; Distributed Rollback                </tspan><tspan fill="#58a6ff">│</tspan></text>
+      <text y="90" fill="#58a6ff">└────────────────────────────────────────────────────────────────────────┘</text>
+
+      <!-- Execution steps -->
+      <text y="125">
+        <tspan fill="#8b949e">Step 1: </tspan>
+        <tspan fill="#c9d1d9">Creating test account </tspan>
+        <tspan fill="#00f0ff">"sim_user_8223"</tspan>
+        <tspan fill="#c9d1d9"> with balance </tspan>
+        <tspan fill="#3fb950" font-weight="bold">$30.00</tspan>
+        <tspan fill="#c9d1d9">...</tspan>
+      </text>
+      <text y="148" fill="#6e7681">[OrderService] Database initialized with SQLite WAL mode (Port 3001)</text>
+      <text y="168" fill="#6e7681">[BankService]  Database initialized with SQLite WAL mode (Port 3002)</text>
+
+      <text y="200">
+        <tspan fill="#8b949e">Step 2: </tspan>
+        <tspan fill="#c9d1d9">Placing order for </tspan>
+        <tspan fill="#d29922" font-weight="bold">$100.00</tspan>
+        <tspan fill="#8b949e"> (exceeds balance of $30.00)...</tspan>
+      </text>
+      <text y="222" fill="#6e7681">[OrderService]       Atomically wrote order (PENDING) and outbox event (order.created)</text>
+      <text y="242" fill="#6e7681">[OrderOutboxWorker]  Dispatched event to InMemoryEventBus</text>
+      <text y="262" fill="#f85149">[BankEventConsumer]  Payment failed: Insufficient balance: required $100.00, available $30.00</text>
+      <text y="282" fill="#6e7681">[BankOutboxWorker]   Dispatched "payment.failed" compensation event</text>
+      <text y="302" fill="#d29922">[OrderEventConsumer] Order be4db51a marked CANCELLED [Compensated]</text>
+
+      <text y="336">
+        <tspan fill="#8b949e">Step 3: </tspan>
+        <tspan fill="#c9d1d9">Saga choreography settled in </tspan>
+        <tspan fill="#00f0ff" font-weight="bold">7ms</tspan>
+        <tspan fill="#c9d1d9">. Verifying distributed consistency...</tspan>
+      </text>
+
+      <!-- Verification Summary Box -->
+      <text y="372" fill="#58a6ff">┌─ SAGA COMPENSATION VERIFICATION ───────────────────────────────────────┐</text>
+      <text y="394" fill="#58a6ff">│  <tspan fill="#8b949e">Simulated User:     </tspan><tspan fill="#00f0ff">sim_user_8223</tspan><tspan fill="#58a6ff" x="731">│</tspan></text>
+      <text y="416" fill="#58a6ff">│  <tspan fill="#8b949e">Starting Balance:   </tspan><tspan fill="#ffffff">$30.00</tspan><tspan fill="#58a6ff" x="731">│</tspan></text>
+      <text y="438" fill="#58a6ff">│  <tspan fill="#8b949e">Order Requested:    </tspan><tspan fill="#d29922">$100.00</tspan><tspan fill="#58a6ff" x="731">│</tspan></text>
+      <text y="460" fill="#58a6ff">│  <tspan fill="#8b949e">Order Final State:  </tspan><tspan fill="#f85149" font-weight="bold">✕ CANCELLED</tspan><tspan fill="#58a6ff" x="731">│</tspan></text>
+      <text y="482" fill="#58a6ff">│  <tspan fill="#8b949e">Bank Final Balance: </tspan><tspan fill="#3fb950" font-weight="bold">$30.00 (100% UNCHANGED · Zero corruption)</tspan><tspan fill="#58a6ff" x="731">│</tspan></text>
+      <text y="504" fill="#58a6ff">│  <tspan fill="#8b949e">ACID Invariant:     </tspan><tspan fill="#3fb950">CHECK (balance >= 0) database constraint preserved</tspan><tspan fill="#58a6ff" x="731">│</tspan></text>
+      <text y="526" fill="#58a6ff">└────────────────────────────────────────────────────────────────────────┘</text>
+    </g>
+  </g>
+</svg>

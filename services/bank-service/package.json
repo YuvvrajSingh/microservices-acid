@@ -1,0 +1,14 @@
+{
+  "name": "@microservices-acid/bank-service",
+  "version": "1.0.0",
+  "description": "Bank Service with SQLite WAL, Inbox/Outbox pattern, and Local ACID Transactions",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "test": "tsx --test tests/**/*.test.ts"
+  },
+  "dependencies": {
+    "better-sqlite3": "^13.0.3",
+    "express": "^5.2.1"
+  }
+}

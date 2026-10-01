@@ -1,0 +1,36 @@
+{
+  "name": "microservices-acid",
+  "version": "1.0.0",
+  "description": "ACID microservices architecture demonstration with Outbox and Inbox patterns",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test shared/**/*.test.ts services/**/test/**/*.test.ts services/**/tests/**/*.test.ts test/**/*.test.ts",
+    "cli": "tsx cli.ts"
+  },
+  "keywords": [
+    "microservices",
+    "acid",
+    "outbox",
+    "inbox",
+    "sqlite",
+    "event-driven"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "better-sqlite3": "^13.0.3",
+    "express": "^5.2.1",
+    "uuid": "^14.0.2"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^9.6.0",
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.6.3",
+    "@types/uuid": "^10.0.0",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  }
+}
