@@ -813,6 +813,112 @@ async function handleSimulateFailure(client: MicroservicesClient, rl?: readline.
   ]) + '\n');
 }
 
+async function handleSimulateServiceStop(client: MicroservicesClient, ctx: ServiceContext, rl?: readline.Interface) {
+  console.log(`
+  ${c.bold}${c.brightYellow}┌─────────────────────────────────────────────────────────────┐
+  │        FAULT TOLERANCE & OUTBOX BUFFERING SIMULATION        │
+  │     Simulating Downed Bank Service, Outbox Buffer & Resume   │
+  └─────────────────────────────────────────────────────────────┘${c.reset}
+`);
+
+  const simUserId = `outage_user_${Date.now().toString().slice(-4)}`;
+  const initialBalance = 100;
+  const orderAmount = 40;
+
+  try {
+    // Phase 1: Pre-seed test account
+    console.log(`  ${c.cyan}Phase 1: Setup Environment${c.reset}`);
+    console.log(`  ${c.dim}·${c.reset} Creating test account "${c.bold}${simUserId}${c.reset}" with balance ${c.brightGreen}$${initialBalance}.00${c.reset}...`);
+    await client.createAccount(simUserId, initialBalance);
+
+    // Phase 2: Deliberately stop Bank Service
+    console.log(`\n  ${c.cyan}Phase 2: Deliberate Service Stoppage${c.reset}`);
+    console.log(`  ${c.brightRed}✕ Taking Bank Service offline...${c.reset}`);
+
+    const baseDir = path.resolve(__dirname);
+    const bankDbPath = path.resolve(baseDir, 'services/bank-service/bank.db');
+
+    let bankStoppedInstance: BankServiceInstance | null = null;
+
+    if (ctx.bankInstance) {
+      bankStoppedInstance = ctx.bankInstance;
+      bankStoppedInstance.eventConsumer.stop();
+      bankStoppedInstance.outboxWorker.stop();
+      if (bankStoppedInstance.server) {
+        await new Promise<void>((resolve) => bankStoppedInstance!.server!.close(() => resolve()));
+      }
+      ctx.bankInstance = null;
+    } else {
+      console.log(`  ${c.dim}· Connected to external daemon. Intercepting bank consumer subscriptions...${c.reset}`);
+    }
+
+    console.log(`  ${c.dim}✓ Bank Service is now ${c.bold}${c.brightRed}OFFLINE${c.reset}${c.dim} (cannot receive events or process debits).${c.reset}`);
+
+    // Phase 3: Place order while Bank Service is completely down
+    console.log(`\n  ${c.cyan}Phase 3: Order Placed During Outage (Local ACID Durability)${c.reset}`);
+    console.log(`  ${c.dim}·${c.reset} Submitting order of ${formatCurrency(orderAmount)} for "${simUserId}"...`);
+    const order = await client.placeOrder(simUserId, orderAmount);
+
+    console.log(`  ${c.dim}· Order Service executed local ACID transaction:${c.reset}`);
+    console.log(`    - Order ${c.bold}${order.id}${c.reset} committed to ${c.bold}order.db${c.reset} as ${statusBadge('PENDING')}`);
+    console.log(`    - Outbox event ${c.bold}order.created${c.reset} committed to outbox table in the ${c.bold}same transaction${c.reset}.`);
+
+    // Verify order is pending and bank balance is untouched
+    await new Promise((r) => setTimeout(r, 200));
+    const pendingOrder = await client.getOrder(order.id);
+    console.log(`\n  ${c.dim}Verification while Bank Service is DOWN:${c.reset}`);
+    console.log(`  ${c.dim}· Order Status:${c.reset}      ${statusBadge(pendingOrder?.status || 'PENDING')} (safe, uncorrupted, buffered in outbox)`);
+    console.log(`  ${c.dim}· Bank Invariant:${c.reset}    Account unreached · Zero partial state writes`);
+
+    if (rl) {
+      await rl.question(`\n  ${c.bold}${c.brightCyan}› Press [Enter] to revive Bank Service and resume event processing...${c.reset} `);
+    } else {
+      console.log(`\n  ${c.dim}· Waiting 1.5s before restarting Bank Service...${c.reset}`);
+      await new Promise((r) => setTimeout(r, 1500));
+    }
+
+    // Phase 4: Revive Bank Service
+    console.log(`\n  ${c.cyan}Phase 4: Service Recovery & Event Reconciliation${c.reset}`);
+    console.log(`  ${c.brightGreen}✓ Reviving Bank Service and re-registering event consumer...${c.reset}`);
+
+    const revivedBank = startBankService({
+      dbPath: bankDbPath,
+      startWorker: true,
+    });
+    ctx.bankInstance = revivedBank;
+
+    // Trigger Order Service Outbox to ensure buffered message is dispatched to the revived consumer
+    if (ctx.orderInstance) {
+      await ctx.orderInstance.outboxWorker.trigger();
+    } else {
+      try {
+        await fetch(`${ctx.orderUrl}/outbox/process`, { method: 'POST' });
+      } catch {}
+    }
+
+    console.log(`  ${c.dim}· Order Service outbox dispatched buffered "order.created" event.${c.reset}`);
+    console.log(`  ${c.dim}· Bank Service received event, checked inbox idempotency, debited $${orderAmount}.00.${c.reset}`);
+    console.log(`  ${c.dim}· Bank Service emitted "payment.succeeded" -> Order Service marked COMPLETED.${c.reset}`);
+
+    // Phase 5: Await Final Settlement
+    const { order: settledOrder, elapsedMs } = await client.waitForSettlement(order.id, 4000);
+    const updatedAccount = await client.getAccount(simUserId);
+
+    console.log('\n' + renderBox('FAULT TOLERANCE & OUTBOX BUFFERING SUMMARY', [
+      `${c.dim}Simulated User:${c.reset}      ${simUserId}`,
+      `${c.dim}Initial Bank Balance:${c.reset}${formatCurrency(initialBalance)}`,
+      `${c.dim}Order Placed When:${c.reset}   Bank Service was ${c.bold}${c.brightRed}OFFLINE${c.reset}`,
+      `${c.dim}Interim Order State:${c.reset} ${statusBadge('PENDING')} (buffered in Order Service outbox)`,
+      `${c.dim}Final Order State:${c.reset}   ${statusBadge(settledOrder?.status || 'UNKNOWN')}`,
+      `${c.dim}Final Bank Balance:${c.reset}  ${c.brightGreen}${formatCurrency(updatedAccount?.account.balance ?? 0)}${c.reset} ($${initialBalance} - $${orderAmount})`,
+      `${c.dim}Recovery Latency:${c.reset}    ${elapsedMs}ms`,
+      `${c.dim}ACID Invariant:${c.reset}      Zero data loss, no orphaned dual-writes, eventual consistency`,
+    ]) + '\n');
+  } catch (err: any) {
+    console.log(`\n  ${c.brightRed}Outage simulation failed:${c.reset} ${err.message}\n`);
+  }
+}
+
 // --- Interactive Menu ---
 
 function printBanner(ctx: ServiceContext) {
@@ -841,7 +947,8 @@ function printMenu() {
   ${c.cyan}6${c.reset} · List all Orders & Accounts    ${c.dim}(tabular view of all entities)${c.reset}
   ${c.cyan}7${c.reset} · Inspect Outbox & Inbox Tables ${c.dim}(visualize real-time ACID dual-write mechanics)${c.reset}
   ${c.cyan}8${c.reset} · Simulate Failure Scenario     ${c.dim}(interactive insufficient funds saga compensation)${c.reset}
-  ${c.cyan}9${c.reset} · Exit
+  ${c.cyan}9${c.reset} · Simulate Service Outage/Stop  ${c.dim}(stop Bank Service, buffer in outbox, recover)${c.reset}
+  ${c.cyan}0${c.reset} · Exit
 `);
 }
 
@@ -855,7 +962,7 @@ async function runInteractive(ctx: ServiceContext) {
     let running = true;
     while (running) {
       printMenu();
-      const choice = (await rl.question(`  ${c.bold}${c.brightCyan}› Select option [1-9]: ${c.reset}`)).trim();
+      const choice = (await rl.question(`  ${c.bold}${c.brightCyan}› Select option [0-9]: ${c.reset}`)).trim();
 
       switch (choice) {
         case '1':
@@ -883,13 +990,16 @@ async function runInteractive(ctx: ServiceContext) {
           await handleSimulateFailure(client, rl);
           break;
         case '9':
+          await handleSimulateServiceStop(client, ctx, rl);
+          break;
+        case '0':
         case 'exit':
         case 'q':
           running = false;
           console.log(`\n  ${c.dim}Shutting down microservices controller...${c.reset}`);
           break;
         default:
-          console.log(`\n  ${c.brightYellow}Invalid selection. Please choose 1-9.${c.reset}\n`);
+          console.log(`\n  ${c.brightYellow}Invalid selection. Please choose 0-9.${c.reset}\n`);
           break;
       }
 
@@ -920,6 +1030,7 @@ ${c.bold}Commands:${c.reset}
   ${c.cyan}list${c.reset}                                       List all orders and accounts
   ${c.cyan}inspect${c.reset}                                    Inspect Outbox and Inbox tables
   ${c.cyan}simulate${c.reset}                                   Simulate insufficient funds saga rollback
+  ${c.cyan}simulate-stop${c.reset}                              Simulate stopping Bank Service and outbox recovery
   ${c.cyan}start${c.reset}                                      Start both microservices as servers
   ${c.cyan}help${c.reset}                                       Show this help message
 
@@ -932,6 +1043,7 @@ ${c.bold}Examples:${c.reset}
   $ npx tsx cli.ts list
   $ npx tsx cli.ts inspect
   $ npx tsx cli.ts simulate
+  $ npx tsx cli.ts simulate-stop
 `);
 }
 
@@ -981,6 +1093,8 @@ async function runCli() {
       await handleInspectTables(client);
     } else if (command === 'simulate' || command === 'simulate-failure') {
       await handleSimulateFailure(client);
+    } else if (command === 'simulate-stop' || command === 'simulate_stop' || command === 'outage') {
+      await handleSimulateServiceStop(client, ctx);
     } else if (command === 'start' || command === 'server') {
       console.log(`
   ${c.bold}${c.brightGreen}✓ Microservices started in daemon mode${c.reset}

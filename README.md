@@ -67,11 +67,13 @@ In a distributed system, individual microservices maintain private databases. Co
 
 ### Core Invariants
 
-1. **Dual-Write Prevention (Transactional Outbox)**: State changes and outbound domain events are committed in the same database transaction. Network failures cannot leave an entity saved without its corresponding event.
-2. **At-Least-Once Delivery**: Polling workers read pending outbox entries and publish them to the event bus with retry logic.
-3. **Consumer Idempotency (Inbox Pattern)**: Consumers record received event IDs in an `inbox` table. Duplicate messages delivered over the wire are discarded before state mutation.
-4. **Saga Compensation**: When a debit violates business constraints (e.g. insufficient balance), the Bank emits `payment.failed`. The Order Service handles this by updating the order status to `CANCELLED`.
-5. **Database-Level Invariants**: Account tables declare `CHECK (balance >= 0)` to guarantee balance integrity at the storage layer.
+1. **Private Databases & Storage Isolation**: Each microservice manages its own SQLite database (`services/order-service/order.db` and `services/bank-service/bank.db`). There are zero cross-database queries, shared locks, or distributed 2PC transactions.
+2. **Dual-Write Prevention (Transactional Outbox)**: State changes and outbound domain events commit in the same local database transaction. Network failures cannot leave an entity saved without its corresponding event.
+3. **Failure Isolation & Outbox Buffering**: If a downstream service crashes or goes offline, the calling service continues accepting transactions locally. Outbound events buffer safely in the local outbox until the downstream service recovers.
+4. **At-Least-Once Delivery**: Polling workers read pending outbox entries and publish them to the event bus with retry logic.
+5. **Consumer Idempotency (Inbox Pattern)**: Consumers record received event IDs in an `inbox` table. Duplicate messages delivered over the wire are discarded before state mutation.
+6. **Saga Compensation**: When a debit violates business constraints (e.g. insufficient balance), the Bank emits `payment.failed`. The Order Service handles this by updating the order status to `CANCELLED`.
+7. **Database-Level Invariants**: Account tables declare `CHECK (balance >= 0)` to guarantee balance integrity at the storage layer.
 
 ---
 
@@ -85,6 +87,7 @@ microservices-acid/
 │   └── index.ts                  # Shared exports
 ├── services/
 │   ├── order-service/            # Order creation & lifecycle management
+│   │   ├── order.db              # Dedicated SQLite WAL database for Order Service
 │   │   ├── src/
 │   │   │   ├── db.ts             # SQLite WAL connection, orders + outbox schema
 │   │   │   ├── app.ts            # REST API (Port 3001)
@@ -92,9 +95,10 @@ microservices-acid/
 │   │   │   └── eventConsumer.ts  # Saga consumer (payment outcomes)
 │   │   └── test/                 # Service-level unit tests
 │   └── bank-service/             # Account ledger & balance management
+│       ├── bank.db               # Dedicated SQLite WAL database for Bank Service
 │       ├── src/
 │       │   ├── db.ts             # Accounts schema with CHECK (balance >= 0)
-│       │   ├── app.ts            # REST API (Port 3002)
+│       │   ├── api.ts            # REST API (Port 3002)
 │       │   ├── outboxWorker.ts   # Background outbox publisher
 │       │   └── eventConsumer.ts  # Debit consumer with inbox deduplication
 │       └── tests/                # Service-level unit tests
@@ -141,7 +145,9 @@ The project includes an interactive terminal interface and scriptable subcommand
 npm run cli
 ```
 
-Provides a numbered console interface for managing accounts, placing orders, triggering outbox polling, and inspecting raw database tables.
+Provides a numbered console interface for managing accounts, placing orders, triggering outbox polling, and inspecting raw database tables:
+- **Option 8**: Simulate insufficient funds rollback (Saga compensation).
+- **Option 9**: Simulate stopping a service (takes Bank Service offline, buffers order in outbox, restarts Bank Service, and verifies eventual consistency).
 
 ### Non-Interactive Commands
 
@@ -166,6 +172,9 @@ npm run cli -- inspect
 
 # 7. Run automated saga compensation simulation (insufficient funds rollback)
 npm run cli -- simulate
+
+# 8. Run service outage and outbox recovery simulation
+npm run cli -- simulate-stop
 ```
 
 ---
@@ -182,6 +191,7 @@ When started via `npx tsx cli.ts start`, services expose HTTP endpoints:
 | `GET` | `/orders/:id` | Get order status by ID |
 | `GET` | `/orders` | List recent orders |
 | `GET` | `/outbox` | View outbox records |
+| `POST` | `/outbox/process` | Trigger outbox publishing worker |
 | `GET` | `/inbox` | View processed event IDs |
 
 ### Bank Service (Port 3002)
@@ -193,6 +203,7 @@ When started via `npx tsx cli.ts start`, services expose HTTP endpoints:
 | `POST` | `/accounts/:userId/deposit` | Deposit funds |
 | `GET` | `/accounts/:userId/transactions` | View audit ledger |
 | `GET` | `/outbox` | View outbox records |
+| `POST` | `/outbox/process` | Trigger outbox publishing worker |
 | `GET` | `/inbox` | View processed event IDs |
 
 ---

@@ -133,6 +133,21 @@ export function createOrderApp(options: CreateOrderAppOptions): express.Express 
     }
   });
 
+  // Trigger outbox processing
+  app.post('/outbox/process', async (_req: Request, res: Response): Promise<void> => {
+    try {
+      if (!outboxWorker) {
+        res.status(400).json({ error: 'OutboxWorker not configured on this instance' });
+        return;
+      }
+      const publishedCount = await outboxWorker.processPending();
+      res.json({ success: true, publishedCount });
+    } catch (err: any) {
+      console.error('[OrderApp] Error processing outbox:', err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
   // Global error handler
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     console.error('[OrderApp] Internal server error:', err);
