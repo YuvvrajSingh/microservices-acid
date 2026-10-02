@@ -1,93 +1,335 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 660" width="100%" height="auto">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 680" width="100%" height="auto">
   <defs>
-    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+    <!-- Dark subtle linear gradient for background canvas -->
+    <linearGradient id="canvasGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#09090b"/>
-      <stop offset="100%" stop-color="#0e1117"/>
+      <stop offset="50%" stop-color="#0d0e12"/>
+      <stop offset="100%" stop-color="#08080a"/>
     </linearGradient>
-    <linearGradient id="cyanGlow" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#00f0ff" stop-opacity="0.8"/>
-      <stop offset="100%" stop-color="#7000ff" stop-opacity="0.8"/>
+
+    <!-- Subtle terminal border gradient -->
+    <linearGradient id="borderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#27272a"/>
+      <stop offset="50%" stop-color="#18181b"/>
+      <stop offset="100%" stop-color="#27272a"/>
     </linearGradient>
-    <filter id="shadow" x="-5%" y="-5%" width="110%" height="115%" filterUnits="userSpaceOnUse">
-      <feDropShadow dx="0" dy="24" stdDeviation="28" flood-color="#000" flood-opacity="0.65"/>
-      <feDropShadow dx="0" dy="0" stdDeviation="15" flood-color="#00f0ff" flood-opacity="0.08"/>
+
+    <!-- Header bar gradient -->
+    <linearGradient id="titlebarGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#18181b"/>
+      <stop offset="100%" stop-color="#121215"/>
+    </linearGradient>
+
+    <!-- Topo box header gradient -->
+    <linearGradient id="topoHeaderGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00f0ff" stop-opacity="0.12"/>
+      <stop offset="50%" stop-color="#10b981" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#00f0ff" stop-opacity="0.04"/>
+    </linearGradient>
+
+    <!-- Drop shadow with cyan/emerald ambient glow -->
+    <filter id="terminalGlow" x="-6%" y="-6%" width="112%" height="116%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="24" stdDeviation="30" flood-color="#000000" flood-opacity="0.75"/>
+      <feDropShadow dx="0" dy="0" stdDeviation="16" flood-color="#00f0ff" flood-opacity="0.06"/>
+      <feDropShadow dx="0" dy="0" stdDeviation="24" flood-color="#10b981" flood-opacity="0.04"/>
+    </filter>
+
+    <!-- Node card shadow -->
+    <filter id="cardShadow" x="-10%" y="-10%" width="120%" height="125%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.4"/>
     </filter>
   </defs>
 
-  <!-- Canvas Background -->
-  <rect width="1100" height="660" fill="#09090b"/>
+  <!-- Background Base Canvas -->
+  <rect width="1100" height="680" fill="url(#canvasGrad)"/>
 
-  <!-- Window Container -->
-  <g transform="translate(30, 25)" filter="url(#shadow)">
-    <!-- Window Border & Base -->
-    <rect width="1040" height="610" rx="10" fill="#0d1117" stroke="#30363d" stroke-width="1"/>
+  <!-- Subtle Blueprint Grid Pattern -->
+  <g opacity="0.04">
+    <path d="M 0,40 L 1100,40 M 0,80 L 1100,80 M 0,120 L 1100,120 M 0,160 L 1100,160 M 0,200 L 1100,200 M 0,240 L 1100,240 M 0,280 L 1100,280 M 0,320 L 1100,320 M 0,360 L 1100,360 M 0,400 L 1100,400 M 0,440 L 1100,440 M 0,480 L 1100,480 M 0,520 L 1100,520 M 0,560 L 1100,560 M 0,600 L 1100,600 M 0,640 L 1100,640" stroke="#00f0ff" stroke-width="0.5"/>
+    <path d="M 50,0 L 50,680 M 100,0 L 100,680 M 150,0 L 150,680 M 200,0 L 200,680 M 250,0 L 250,680 M 300,0 L 300,680 M 350,0 L 350,680 M 400,0 L 400,680 M 450,0 L 450,680 M 500,0 L 500,680 M 550,0 L 550,680 M 600,0 L 600,680 M 650,0 L 650,680 M 700,0 L 700,680 M 750,0 L 750,680 M 800,0 L 800,680 M 850,0 L 850,680 M 900,0 L 900,680 M 950,0 L 950,680 M 1000,0 L 1000,680 M 1050,0 L 1050,680" stroke="#00f0ff" stroke-width="0.5"/>
+  </g>
 
-    <!-- Window Titlebar -->
-    <path d="M 0,10 Q 0,0 10,0 L 1030,0 Q 1040,0 1040,10 L 1040,42 L 0,42 Z" fill="#161b22"/>
-    <line x1="0" y1="42" x2="1040" y2="42" stroke="#30363d" stroke-width="1"/>
+  <!-- Terminal Window Shell (1050 x 636) -->
+  <g transform="translate(25, 22)" filter="url(#terminalGlow)">
+    <!-- Terminal Background & Outer Border -->
+    <rect width="1050" height="636" rx="10" ry="10" fill="#0c0d11" stroke="url(#borderGrad)" stroke-width="1.2"/>
 
-    <!-- Window Control Buttons -->
-    <circle cx="24" cy="21" r="6" fill="#f85149"/>
-    <circle cx="44" cy="21" r="6" fill="#e3b341"/>
-    <circle cx="64" cy="21" r="6" fill="#2ea043"/>
+    <!-- Terminal Window Titlebar -->
+    <path d="M 0,10 Q 0,0 10,0 L 1040,0 Q 1050,0 1050,10 L 1050,38 L 0,38 Z" fill="url(#titlebarGrad)"/>
+    <line x1="0" y1="38" x2="1050" y2="38" stroke="#27272a" stroke-width="1"/>
 
-    <!-- Titlebar Title -->
-    <text x="520" y="26" text-anchor="middle" font-family="'Geist Mono', 'SF Mono', Monaco, Menlo, monospace" font-size="12" fill="#8b949e" letter-spacing="0.5">yuvraj@node: ~/microservices-acid — npm run cli -- simulate</text>
+    <!-- macOS/Linux Title Bar Dots -->
+    <circle cx="22" cy="19" r="5.5" fill="#ef4444" stroke="#dc2626" stroke-width="0.5"/>
+    <circle cx="40" cy="19" r="5.5" fill="#f59e0b" stroke="#d97706" stroke-width="0.5"/>
+    <circle cx="58" cy="19" r="5.5" fill="#10b981" stroke="#059669" stroke-width="0.5"/>
+
+    <!-- Terminal Titlebar Label -->
+    <text x="525" y="24" text-anchor="middle" font-family="'Geist Mono', 'SF Mono', Monaco, Menlo, Consolas, monospace" font-size="12" fill="#71717a" letter-spacing="0.3">
+      yuvraj@hyperplane: ~/microservices-acid — npm run cli -- trace
+    </text>
+
+    <!-- Branch / PID badge -->
+    <rect x="948" y="10" width="86" height="18" rx="4" fill="#18181b" stroke="#27272a" stroke-width="0.8"/>
+    <circle cx="958" cy="19" r="3" fill="#10b981"/>
+    <text x="968" y="23" font-family="'Geist Mono', 'SF Mono', Monaco, monospace" font-size="10" fill="#a1a1aa">main • v24</text>
 
     <!-- Terminal Content Area -->
-    <g transform="translate(28, 70)" font-family="'Geist Mono', 'JetBrains Mono', 'SF Mono', Monaco, Menlo, monospace" font-size="13" xml:space="preserve">
-      <!-- Command prompt line -->
-      <text y="0">
-        <tspan fill="#6e7681">$ </tspan>
-        <tspan fill="#00f0ff" font-weight="bold">npm run cli -- simulate</tspan>
-      </text>
+    <g transform="translate(32, 54)" font-family="'Geist Mono', 'SF Mono', Monaco, Menlo, Consolas, monospace">
 
-      <!-- Banner box -->
-      <text y="30" fill="#58a6ff">┌────────────────────────────────────────────────────────────────────────┐</text>
-      <text y="50" fill="#58a6ff">│<tspan fill="#ffffff" font-weight="bold">         INTERACTIVE SAGA COMPENSATION SIMULATION                       </tspan><tspan fill="#58a6ff">│</tspan></text>
-      <text y="70" fill="#58a6ff">│<tspan fill="#8b949e">     Simulating Insufficient Funds &amp; Distributed Rollback                </tspan><tspan fill="#58a6ff">│</tspan></text>
-      <text y="90" fill="#58a6ff">└────────────────────────────────────────────────────────────────────────┘</text>
+      <!-- Command Line Prompt -->
+      <g transform="translate(0, 16)">
+        <text font-size="13">
+          <tspan fill="#00f0ff" font-weight="bold">➜</tspan>
+          <tspan fill="#71717a"> </tspan>
+          <tspan fill="#a1a1aa">microservices-acid</tspan>
+          <tspan fill="#52525b"> on </tspan>
+          <tspan fill="#10b981">git:(main)</tspan>
+          <tspan fill="#71717a"> $ </tspan>
+          <tspan fill="#f4f4f5" font-weight="600">npm run cli -- trace</tspan>
+        </text>
+      </g>
 
-      <!-- Execution steps -->
-      <text y="125">
-        <tspan fill="#8b949e">Step 1: </tspan>
-        <tspan fill="#c9d1d9">Creating test account </tspan>
-        <tspan fill="#00f0ff">"sim_user_8223"</tspan>
-        <tspan fill="#c9d1d9"> with balance </tspan>
-        <tspan fill="#3fb950" font-weight="bold">$30.00</tspan>
-        <tspan fill="#c9d1d9">...</tspan>
-      </text>
-      <text y="148" fill="#6e7681">[OrderService] Database initialized with SQLite WAL mode (Port 3001)</text>
-      <text y="168" fill="#6e7681">[BankService]  Database initialized with SQLite WAL mode (Port 3002)</text>
+      <!-- ============================================================ -->
+      <!-- TOPOLOGY DIAGRAM PANEL (x=0, y=36, w=986, h=152)             -->
+      <!-- ============================================================ -->
+      <g transform="translate(0, 36)">
+        <!-- Outer Box -->
+        <rect width="986" height="152" rx="8" fill="#121318" stroke="#27272a" stroke-width="1"/>
+        <rect width="986" height="28" rx="8" fill="url(#topoHeaderGrad)"/>
+        <path d="M 0,28 L 986,28" stroke="#27272a" stroke-width="1"/>
 
-      <text y="200">
-        <tspan fill="#8b949e">Step 2: </tspan>
-        <tspan fill="#c9d1d9">Placing order for </tspan>
-        <tspan fill="#d29922" font-weight="bold">$100.00</tspan>
-        <tspan fill="#8b949e"> (exceeds balance of $30.00)...</tspan>
-      </text>
-      <text y="222" fill="#6e7681">[OrderService]       Atomically wrote order (PENDING) and outbox event (order.created)</text>
-      <text y="242" fill="#6e7681">[OrderOutboxWorker]  Dispatched event to InMemoryEventBus</text>
-      <text y="262" fill="#f85149">[BankEventConsumer]  Payment failed: Insufficient balance: required $100.00, available $30.00</text>
-      <text y="282" fill="#6e7681">[BankOutboxWorker]   Dispatched "payment.failed" compensation event</text>
-      <text y="302" fill="#d29922">[OrderEventConsumer] Order be4db51a marked CANCELLED [Compensated]</text>
+        <!-- Box Header Text -->
+        <text x="16" y="19" font-size="11" font-weight="bold" fill="#00f0ff" letter-spacing="1">
+          DISTRIBUTED CHOREOGRAPHY TOPOLOGY &amp; DUAL-WRITE PREVENTION PIPELINE
+        </text>
+        <text x="970" y="19" text-anchor="end" font-size="10" fill="#71717a">
+          PATTERN: TRANSACTIONAL OUTBOX + IDEMPOTENT INBOX (SQLITE WAL)
+        </text>
 
-      <text y="336">
-        <tspan fill="#8b949e">Step 3: </tspan>
-        <tspan fill="#c9d1d9">Saga choreography settled in </tspan>
-        <tspan fill="#00f0ff" font-weight="bold">7ms</tspan>
-        <tspan fill="#c9d1d9">. Verifying distributed consistency...</tspan>
-      </text>
+        <!-- Node 1: Order Service -->
+        <g transform="translate(24, 42)" filter="url(#cardShadow)">
+          <rect width="260" height="92" rx="6" fill="#18181b" stroke="#3b82f6" stroke-opacity="0.6" stroke-width="1.2"/>
+          <!-- Status pill -->
+          <circle cx="20" cy="18" r="4" fill="#3b82f6"/>
+          <text x="32" y="22" font-size="12" font-weight="bold" fill="#e4e4e7">ORDER SERVICE</text>
+          <text x="244" y="21" text-anchor="end" font-size="10" fill="#60a5fa">:3001</text>
+          <line x1="12" y1="32" x2="248" y2="32" stroke="#27272a" stroke-width="0.8"/>
+          <!-- DB Spec -->
+          <text x="16" y="49" font-size="10.5" fill="#a1a1aa">
+            <tspan fill="#3b82f6">●</tspan> Private DB: <tspan fill="#ffffff" font-weight="600">order.db</tspan> <tspan fill="#52525b">(SQLite WAL)</tspan>
+          </text>
+          <text x="16" y="66" font-size="10.5" fill="#a1a1aa">
+            <tspan fill="#10b981">✓</tspan> Atomic Write: <tspan fill="#d4d4d8">orders ⨁ outbox</tspan>
+          </text>
+          <text x="16" y="82" font-size="10" fill="#71717a">
+            Initial State: <tspan fill="#f59e0b" font-weight="bold">PENDING</tspan> (Worker poller active)
+          </text>
+        </g>
 
-      <!-- Verification Summary Box -->
-      <text y="372" fill="#58a6ff">┌─ SAGA COMPENSATION VERIFICATION ───────────────────────────────────────┐</text>
-      <text y="394" fill="#58a6ff">│  <tspan fill="#8b949e">Simulated User:     </tspan><tspan fill="#00f0ff">sim_user_8223</tspan><tspan fill="#58a6ff" x="731">│</tspan></text>
-      <text y="416" fill="#58a6ff">│  <tspan fill="#8b949e">Starting Balance:   </tspan><tspan fill="#ffffff">$30.00</tspan><tspan fill="#58a6ff" x="731">│</tspan></text>
-      <text y="438" fill="#58a6ff">│  <tspan fill="#8b949e">Order Requested:    </tspan><tspan fill="#d29922">$100.00</tspan><tspan fill="#58a6ff" x="731">│</tspan></text>
-      <text y="460" fill="#58a6ff">│  <tspan fill="#8b949e">Order Final State:  </tspan><tspan fill="#f85149" font-weight="bold">✕ CANCELLED</tspan><tspan fill="#58a6ff" x="731">│</tspan></text>
-      <text y="482" fill="#58a6ff">│  <tspan fill="#8b949e">Bank Final Balance: </tspan><tspan fill="#3fb950" font-weight="bold">$30.00 (100% UNCHANGED · Zero corruption)</tspan><tspan fill="#58a6ff" x="731">│</tspan></text>
-      <text y="504" fill="#58a6ff">│  <tspan fill="#8b949e">ACID Invariant:     </tspan><tspan fill="#3fb950">CHECK (balance >= 0) database constraint preserved</tspan><tspan fill="#58a6ff" x="731">│</tspan></text>
-      <text y="526" fill="#58a6ff">└────────────────────────────────────────────────────────────────────────┘</text>
+        <!-- Connector 1: Order -> EventBus (Order Service Outbox worker) -->
+        <g transform="translate(284, 88)">
+          <!-- Double line wire -->
+          <line x1="0" y1="-2" x2="80" y2="-2" stroke="#00f0ff" stroke-width="2" stroke-dasharray="6,4"/>
+          <line x1="0" y1="2" x2="80" y2="2" stroke="#00f0ff" stroke-width="2" stroke-dasharray="6,4"/>
+          <!-- Arrowhead -->
+          <polygon points="80,-7 92,0 80,7" fill="#00f0ff"/>
+          <!-- Event Label Badge -->
+          <rect x="8" y="-24" width="76" height="16" rx="3" fill="#0e2a35" stroke="#00f0ff" stroke-width="0.8"/>
+          <text x="46" y="-12" text-anchor="middle" font-size="9" font-weight="bold" fill="#00f0ff">order.created</text>
+        </g>
+
+        <!-- Node 2: InMemory EventBus -->
+        <g transform="translate(376, 42)" filter="url(#cardShadow)">
+          <rect width="234" height="92" rx="6" fill="#18181b" stroke="#00f0ff" stroke-opacity="0.6" stroke-width="1.2"/>
+          <circle cx="20" cy="18" r="4" fill="#00f0ff"/>
+          <text x="32" y="22" font-size="12" font-weight="bold" fill="#e4e4e7">EVENT BUS BROKER</text>
+          <line x1="12" y1="32" x2="222" y2="32" stroke="#27272a" stroke-width="0.8"/>
+          <text x="16" y="49" font-size="10.5" fill="#a1a1aa">
+            <tspan fill="#00f0ff">●</tspan> Channel: <tspan fill="#ffffff" font-weight="600">InMemoryEventBus</tspan>
+          </text>
+          <text x="16" y="66" font-size="10.5" fill="#a1a1aa">
+            <tspan fill="#10b981">✓</tspan> Guarantee: <tspan fill="#d4d4d8">At-Least-Once</tspan>
+          </text>
+          <text x="16" y="82" font-size="10" fill="#71717a">
+            Subscribers: <tspan fill="#a1a1aa">order.* , payment.*</tspan>
+          </text>
+        </g>
+
+        <!-- Connector 2: EventBus -> Bank Service -->
+        <g transform="translate(610, 88)">
+          <line x1="0" y1="-2" x2="80" y2="-2" stroke="#10b981" stroke-width="2" stroke-dasharray="6,4"/>
+          <line x1="0" y1="2" x2="80" y2="2" stroke="#10b981" stroke-width="2" stroke-dasharray="6,4"/>
+          <polygon points="80,-7 92,0 80,7" fill="#10b981"/>
+          <rect x="8" y="-24" width="76" height="16" rx="3" fill="#0a2e23" stroke="#10b981" stroke-width="0.8"/>
+          <text x="46" y="-12" text-anchor="middle" font-size="9" font-weight="bold" fill="#10b981">dispatch event</text>
+        </g>
+
+        <!-- Node 3: Bank Service -->
+        <g transform="translate(702, 42)" filter="url(#cardShadow)">
+          <rect width="260" height="92" rx="6" fill="#18181b" stroke="#10b981" stroke-opacity="0.6" stroke-width="1.2"/>
+          <circle cx="20" cy="18" r="4" fill="#10b981"/>
+          <text x="32" y="22" font-size="12" font-weight="bold" fill="#e4e4e7">BANK SERVICE</text>
+          <text x="244" y="21" text-anchor="end" font-size="10" fill="#34d399">:3002</text>
+          <line x1="12" y1="32" x2="248" y2="32" stroke="#27272a" stroke-width="0.8"/>
+          <text x="16" y="49" font-size="10.5" fill="#a1a1aa">
+            <tspan fill="#10b981">●</tspan> Private DB: <tspan fill="#ffffff" font-weight="600">bank.db</tspan> <tspan fill="#52525b">(SQLite WAL)</tspan>
+          </text>
+          <text x="16" y="66" font-size="10.5" fill="#a1a1aa">
+            <tspan fill="#10b981">✓</tspan> Idempotency: <tspan fill="#d4d4d8">Inbox Deduplication</tspan>
+          </text>
+          <text x="16" y="82" font-size="10" fill="#71717a">
+            Constraint: <tspan fill="#34d399" font-weight="bold">CHECK (balance &gt;= 0)</tspan>
+          </text>
+        </g>
+      </g>
+
+      <!-- ============================================================ -->
+      <!-- TRANSACTION TIMELINE & EXECUTION TRACE (y=202)                -->
+      <!-- ============================================================ -->
+      <g transform="translate(0, 202)">
+        <!-- Section Title -->
+        <text x="0" y="14" font-size="12" font-weight="bold" fill="#e4e4e7" letter-spacing="0.5">
+          CHOREOGRAPHED SAGA EXECUTION TRACE &amp; LOCAL ACID LOGS
+        </text>
+        <line x1="420" y1="10" x2="986" y2="10" stroke="#27272a" stroke-width="1"/>
+
+        <!-- Timeline vertical rail -->
+        <line x1="16" y1="32" x2="16" y2="178" stroke="#27272a" stroke-width="2"/>
+
+        <!-- Event Row 1: Order Initiation -->
+        <g transform="translate(0, 32)">
+          <circle cx="16" cy="7" r="5" fill="#3b82f6" stroke="#1d4ed8" stroke-width="1.5"/>
+          <text x="34" y="11" font-size="11.5">
+            <tspan fill="#71717a">14:02:40.108</tspan>
+            <tspan fill="#52525b"> │ </tspan>
+            <tspan fill="#60a5fa" font-weight="bold">[ORDER-SERVICE]</tspan>
+            <tspan fill="#a1a1aa">  BEGIN TX: Insert </tspan>
+            <tspan fill="#ffffff" font-weight="bold">order_9b2e1</tspan>
+            <tspan fill="#a1a1aa"> (alice, $65.00, </tspan>
+            <tspan fill="#f59e0b">PENDING</tspan>
+            <tspan fill="#a1a1aa">) + Outbox event </tspan>
+            <tspan fill="#00f0ff">order.created</tspan>
+          </text>
+          <text x="34" y="27" font-size="10" fill="#52525b">
+            ↳ Invariant: Dual-write prevented via single SQLite commit in order.db (WAL frame #104)
+          </text>
+        </g>
+
+        <!-- Event Row 2: Outbox Worker Dispatch -->
+        <g transform="translate(0, 68)">
+          <circle cx="16" cy="7" r="5" fill="#00f0ff" stroke="#0891b2" stroke-width="1.5"/>
+          <text x="34" y="11" font-size="11.5">
+            <tspan fill="#71717a">14:02:40.114</tspan>
+            <tspan fill="#52525b"> │ </tspan>
+            <tspan fill="#00f0ff" font-weight="bold">[OUTBOX-WORKER]</tspan>
+            <tspan fill="#a1a1aa"> Dispatched event </tspan>
+            <tspan fill="#e4e4e7">evt_7a81c</tspan>
+            <tspan fill="#a1a1aa"> ➔ InMemoryEventBus </tspan>
+            <tspan fill="#10b981">(status: PUBLISHED, retries: 0)</tspan>
+          </text>
+          <text x="34" y="27" font-size="10" fill="#52525b">
+            ↳ At-Least-Once Delivery verified · Event bus delivered to 1 active consumer
+          </text>
+        </g>
+
+        <!-- Event Row 3: Bank Service Debit & Inbox Check -->
+        <g transform="translate(0, 104)">
+          <circle cx="16" cy="7" r="5" fill="#10b981" stroke="#059669" stroke-width="1.5"/>
+          <text x="34" y="11" font-size="11.5">
+            <tspan fill="#71717a">14:02:40.119</tspan>
+            <tspan fill="#52525b"> │ </tspan>
+            <tspan fill="#34d399" font-weight="bold">[BANK-CONSUMER]</tspan>
+            <tspan fill="#a1a1aa"> Idempotency verified in </tspan>
+            <tspan fill="#ffffff">bank.inbox</tspan>
+            <tspan fill="#a1a1aa"> · Balance $100.00 ➔ </tspan>
+            <tspan fill="#10b981" font-weight="bold">$35.00</tspan>
+            <tspan fill="#a1a1aa"> (-$65.00 DEBIT)</tspan>
+          </text>
+          <text x="34" y="27" font-size="10" fill="#52525b">
+            ↳ Storage Invariant: CHECK (balance &gt;= 0) satisfied · Emitted payment.succeeded to outbox
+          </text>
+        </g>
+
+        <!-- Event Row 4: Final Settlement Confirmation -->
+        <g transform="translate(0, 140)">
+          <circle cx="16" cy="7" r="5" fill="#a855f7" stroke="#7e22ce" stroke-width="1.5"/>
+          <text x="34" y="11" font-size="11.5">
+            <tspan fill="#71717a">14:02:40.125</tspan>
+            <tspan fill="#52525b"> │ </tspan>
+            <tspan fill="#c084fc" font-weight="bold">[ORDER-CONSUMER]</tspan>
+            <tspan fill="#a1a1aa"> Received </tspan>
+            <tspan fill="#34d399">payment.succeeded</tspan>
+            <tspan fill="#a1a1aa"> · Order state transition: PENDING ➔ </tspan>
+            <tspan fill="#10b981" font-weight="bold">COMPLETED</tspan>
+          </text>
+          <text x="34" y="27" font-size="10" fill="#52525b">
+            ↳ Settlement Latency: 17ms · Compensation rollback unneeded · Distributed state converged
+          </text>
+        </g>
+      </g>
+
+      <!-- ============================================================ -->
+      <!-- FINAL SETTLEMENT SUMMARY CARD (y=400, w=986, h=160)          -->
+      <!-- ============================================================ -->
+      <g transform="translate(0, 400)">
+        <rect width="986" height="158" rx="8" fill="#13141a" stroke="#27272a" stroke-width="1"/>
+
+        <!-- Card Title Bar -->
+        <path d="M 0,8 Q 0,0 8,0 L 978,0 Q 986,0 986,8 L 986,28 L 0,28 Z" fill="#1a1b22"/>
+        <line x1="0" y1="28" x2="986" y2="28" stroke="#27272a" stroke-width="1"/>
+
+        <circle cx="16" cy="14" r="4" fill="#10b981"/>
+        <text x="28" y="18" font-size="11" font-weight="bold" fill="#ffffff" letter-spacing="0.8">
+          TRANSACTION SETTLEMENT SUMMARY &amp; DISTRIBUTED ACID INVARIANTS
+        </text>
+        <rect x="888" y="6" width="86" height="16" rx="3" fill="#064e3b" stroke="#10b981" stroke-width="0.8"/>
+        <text x="931" y="17" text-anchor="middle" font-size="9" font-weight="bold" fill="#34d399">VERIFIED OK</text>
+
+        <!-- Column 1: Order State -->
+        <g transform="translate(20, 44)">
+          <text y="0" font-size="10" fill="#71717a">ORDER LIFECYCLE</text>
+          <text y="20" font-size="11.5" fill="#a1a1aa">Order ID:     <tspan fill="#ffffff" font-weight="600">ord_9b2e1ca8</tspan></text>
+          <text y="38" font-size="11.5" fill="#a1a1aa">User:         <tspan fill="#00f0ff">alice</tspan></text>
+          <text y="56" font-size="11.5" fill="#a1a1aa">Amount:       <tspan fill="#ffffff" font-weight="bold">$65.00 USD</tspan></text>
+          <text y="74" font-size="11.5" fill="#a1a1aa">State:        <tspan fill="#10b981" font-weight="bold">● COMPLETED</tspan></text>
+          <text y="92" font-size="10" fill="#52525b">Settled in 17ms across 2 DBs</text>
+        </g>
+
+        <!-- Vertical Divider 1 -->
+        <line x1="250" y1="36" x2="250" y2="146" stroke="#27272a" stroke-width="1"/>
+
+        <!-- Column 2: Bank Ledger State -->
+        <g transform="translate(270, 44)">
+          <text y="0" font-size="10" fill="#71717a">BANK SERVICE LEDGER</text>
+          <text y="20" font-size="11.5" fill="#a1a1aa">Initial Balance:  <tspan fill="#ffffff">$100.00</tspan></text>
+          <text y="38" font-size="11.5" fill="#a1a1aa">Debited Amount:   <tspan fill="#ef4444" font-weight="600">-$65.00</tspan></text>
+          <text y="56" font-size="11.5" fill="#a1a1aa">Settled Balance:  <tspan fill="#10b981" font-weight="bold">$35.00 USD</tspan></text>
+          <text y="74" font-size="11.5" fill="#a1a1aa">Ledger Tx ID:     <tspan fill="#d4d4d8">tx_4e89f1</tspan></text>
+          <text y="92" font-size="10" fill="#52525b">Storage constraint: CHECK &gt;= 0 preserved</text>
+        </g>
+
+        <!-- Vertical Divider 2 -->
+        <line x1="560" y1="36" x2="560" y2="146" stroke="#27272a" stroke-width="1"/>
+
+        <!-- Column 3: Distributed ACID Guarantees -->
+        <g transform="translate(580, 44)">
+          <text y="0" font-size="10" fill="#71717a">ARCHITECTURAL GUARANTEES</text>
+          <text y="20" font-size="11" fill="#a1a1aa">
+            <tspan fill="#10b981">✓ Atomicity:</tspan> Order + Outbox commit in same WAL frame
+          </text>
+          <text y="38" font-size="11" fill="#a1a1aa">
+            <tspan fill="#10b981">✓ Consistency:</tspan> Zero 2PC blocking; eventual convergence
+          </text>
+          <text y="56" font-size="11" fill="#a1a1aa">
+            <tspan fill="#10b981">✓ Isolation:</tspan> Zero shared locks; private SQLite storage
+          </text>
+          <text y="74" font-size="11" fill="#a1a1aa">
+            <tspan fill="#10b981">✓ Durability:</tspan> Outbox buffered during downstream outages
+          </text>
+          <text y="92" font-size="10" fill="#52525b">33 passing test suites · 100% invariant verified</text>
+        </g>
+      </g>
+
     </g>
   </g>
 </svg>

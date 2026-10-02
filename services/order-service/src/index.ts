@@ -49,8 +49,8 @@ export function startOrderService(options: {
     outboxWorker.stop();
     eventConsumer.stop();
     if (server) {
-      await new Promise<void>((resolve, reject) => {
-        server!.close((err) => (err ? reject(err) : resolve()));
+      await new Promise<void>((resolve) => {
+        server!.close(() => resolve());
       });
     }
     db.close();

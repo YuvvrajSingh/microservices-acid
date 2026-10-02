@@ -146,34 +146,39 @@ npm run cli
 ```
 
 Provides a numbered console interface for managing accounts, placing orders, triggering outbox polling, and inspecting raw database tables:
-- **Option 8**: Simulate insufficient funds rollback (Saga compensation).
-- **Option 9**: Simulate stopping a service (takes Bank Service offline, buffers order in outbox, restarts Bank Service, and verifies eventual consistency).
+- **Option 5**: Trace distributed transaction (live topology diagram + saga step timeline).
+- **Option 8**: Inspect Outbox & Inbox tables (side-by-side split-pane comparison).
+- **Option 9**: Simulate insufficient funds rollback (Saga compensation).
+- **Option 10**: Simulate stopping a service (takes Bank Service offline, buffers order in outbox, restarts Bank Service, and verifies eventual consistency).
 
 ### Non-Interactive Commands
 
 ```bash
-# 1. Create a bank account with $100 initial balance
+# 1. Live trace a distributed transaction with architecture topology & saga timeline
+npm run cli -- trace alice 40
+
+# 2. Create a bank account with $100 initial balance
 npm run cli -- create-account alice 100
 
-# 2. Deposit additional funds
+# 3. Deposit additional funds
 npm run cli -- deposit alice 50
 
-# 3. Check account balance and ledger history
+# 4. Check account balance and ledger history
 npm run cli -- balance alice
 
-# 4. Place an order (triggers outbox -> broker -> bank debit -> saga completion)
+# 5. Place an order (triggers outbox -> broker -> bank debit -> saga completion)
 npm run cli -- order alice 40
 
-# 5. Check order status
+# 6. Check order status
 npm run cli -- status <order-id>
 
-# 6. Inspect Outbox and Inbox tables across both microservices
+# 7. Inspect Outbox and Inbox tables across both microservices (Split-Pane view)
 npm run cli -- inspect
 
-# 7. Run automated saga compensation simulation (insufficient funds rollback)
+# 8. Run automated saga compensation simulation (insufficient funds rollback)
 npm run cli -- simulate
 
-# 8. Run service outage and outbox recovery simulation
+# 9. Run service outage and outbox recovery simulation
 npm run cli -- simulate-stop
 ```
 
